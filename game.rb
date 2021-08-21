@@ -14,17 +14,17 @@ class Game
     end
 
     puts "\n\n"
-    word_in_progress_display
-    guesses_display
+    display_word_in_progress
+    display_guesses
     curr_guess = player_guess
-    guess_handler(curr_guess)
+    handle_guess(curr_guess)
     until correct_word_guess?(curr_guess) || guessed_all_letters? ||
           out_of_guesses? || curr_guess == "quit"
       puts "\n\n"
-      word_in_progress_display
-      guesses_display
+      display_word_in_progress
+      display_guesses
       curr_guess = player_guess
-      guess_handler(curr_guess)
+      handle_guess(curr_guess)
     end
 
     if correct_word_guess?(curr_guess)
@@ -34,6 +34,8 @@ class Game
     elsif out_of_guesses?
       puts "You Lose! Too many incorrect guesses"
       puts "The correct word was #{@word_to_guess}"
+    else
+      puts "Thanks for playing Hangman!"
     end
   end
 
@@ -42,7 +44,7 @@ class Game
   def player_guess
     input = ""
     until input.length == 1 || input.length == @word_to_guess.length ||
-          quit_or_cheat?(input)
+          quit_cheat_or_save?(input)
       print "Enter a letter or word to guess or 'quit' to quit: "
       input = gets.chomp.strip.downcase
       if @guesses.include?(input)
@@ -51,7 +53,7 @@ class Game
       end
 
       unless valid_letter_guess?(input) || valid_word_guess?(input) ||
-             quit_or_cheat?(input)
+             quit_cheat_or_save?(input)
         puts "\n\nGuess must be a single letter or the length of the secret word\n\n"
       end
     end
@@ -59,7 +61,7 @@ class Game
     input
   end
 
-  def guess_handler(curr_guess)
+  def handle_guess(curr_guess)
     if curr_guess == "cheat"
       puts @word_to_guess
       puts
@@ -95,8 +97,8 @@ class Game
       all_chars_between?(guess.downcase, "a", "z")
   end
 
-  def quit_or_cheat?(input)
-    input == "cheat" || input == "quit"
+  def quit_cheat_or_save?(input)
+    ["quit","cheat","save"].include?(input)
   end
 
   def all_chars_between?(str, char_a, char_b)
@@ -129,7 +131,7 @@ class Game
     word
   end
 
-  def word_in_progress_display
+  def display_word_in_progress
     word = word_in_progress
     puts spread_string(word)
     puts
@@ -141,7 +143,7 @@ class Game
     out
   end
 
-  def guesses_display
+  def display_guesses
     guesses_str = spread_string(@guesses.join(""))
     puts "Guesses: #{guesses_str}"
     puts
