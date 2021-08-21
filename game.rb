@@ -18,7 +18,7 @@ class Game
     display_guesses
     curr_guess = player_guess
     handle_guess(curr_guess)
-    until correct_word_guess?(curr_guess) || guessed_all_letters? ||
+    until correct_word_guess?(curr_guess) || all_letters_guessed? ||
           out_of_guesses? || curr_guess == "quit"
       puts "\n\n"
       display_word_in_progress
@@ -29,7 +29,7 @@ class Game
 
     if correct_word_guess?(curr_guess)
       puts "You Win! You correctly guessed #{@word_to_guess}!"
-    elsif guessed_all_letters?
+    elsif all_letters_guessed?
       puts "You Win! You guessed all of the letters in #{@word_to_guess}!"
     elsif out_of_guesses?
       puts "You Lose! Too many incorrect guesses"
@@ -40,6 +40,20 @@ class Game
   end
 
   private
+
+  def save
+    filename = file_to_save_to
+    if File.open(filename, 'w') do |file|
+        YAML.dump(self, file)
+      end
+    end
+  end
+
+  def file_to_save_to
+    print "Enter a name to save this game as: "
+    input = gets.chomp.strip
+    #------------------------------------------------------
+  end
 
   def player_guess
     input = ""
@@ -65,6 +79,8 @@ class Game
     if curr_guess == "cheat"
       puts @word_to_guess
       puts
+    elsif curr_guess == "save"
+      save(name_to_save_as)
     elsif valid_letter_guess?(curr_guess)
       unless correct_letter_guess?(curr_guess)
         @incorrect_guesses_remaining -= 1
@@ -151,7 +167,7 @@ class Game
     puts
   end
 
-  def guessed_all_letters?
+  def all_letters_guessed?
     @word_to_guess.chars.all? { |char| @guesses.include?(char) }
   end
 
