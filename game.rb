@@ -1,27 +1,29 @@
 require "pry-byebug"
 
 class Game
+  attr_reader :word_to_guess, :guesses, :incorrect_guesses_remaining
+
   def initialize
   end
 
-  def play(filename = "")
-    if filename.empty?
-      @word_to_guess = random_word
-      @incorrect_guesses_remaining = 8
-      @guesses = []
+  def play(new_game = true)
+    if new_game
+      new_game_setup
     else
-      #file loading stuff
+      unless display_load_menu
+        new_game_setup
+      end
     end
 
     puts "\n\n"
-    display_word_in_progress
+    display_word_in_progress(@word_to_guess, @guesses)
     display_guesses
     curr_guess = player_guess
     handle_guess(curr_guess)
     until correct_word_guess?(curr_guess) || all_letters_guessed? ||
           out_of_guesses? || curr_guess == "quit"
       puts "\n\n"
-      display_word_in_progress
+      display_word_in_progress(@word_to_guess, @guesses)
       display_guesses
       curr_guess = player_guess
       handle_guess(curr_guess)
@@ -41,18 +43,95 @@ class Game
 
   private
 
+  def new_game_setup
+    @word_to_guess = random_word
+    @incorrect_guesses_remaining = 8
+    @guesses = []
+  end
+
   def save
-    filename = file_to_save_to
-    if File.open(filename, 'w') do |file|
-        YAML.dump(self, file)
-      end
+    path = path_to_save_to
+    File.open(path, "w") do |file|
+      YAML.dump(self, file)
     end
   end
 
-  def file_to_save_to
-    print "Enter a name to save this game as: "
+  def path_to_save_to
+    print "Enter a name to save this game as (ex: 'bunny'): "
+    dupe_index = 0
     input = gets.chomp.strip
-    #------------------------------------------------------
+    input = "0" if input.empty?
+    save_name = "#{input}#{dupe_index}"
+    return input if !File.exist?(save_name_to_path(save_name))
+
+    while File.exist?(save_name_to_path(save_name))
+      dupe_index += 1
+      save_name = "#{input}#{dupe_index}"
+    end
+    save_name_to_path(save_name)
+  end
+
+  def save_name_to_path(save_name)
+    "saves/#{save_name}.yaml"
+  end
+
+  def path_to_save_name(path)
+    path.gsub("saves/", "").gsub(".yaml", "")
+  end
+
+  def display_load_menu
+    paths = Dir.glob("saves/*.yaml").sort
+    if paths.length > 0
+      file_number = 1
+      paths.each do |path|
+        print "[#{file_number}] "
+        display_save_game_info(path)
+        puts "\n\n"
+        file_number += 1
+      end
+      print "Select the number [x] of the file you want to load (ex: '1'): "
+      input = gets.chomp.strip
+      until load_file_number_valid(input, paths)
+        print "Selection must be a number listed: "
+        input = gets.chomp.strip
+      end
+      return load_game(paths[input.to_i - 1])
+    else
+      puts "No games to load\n\n"
+      false
+    end
+  end
+
+  def load_file_number_valid(input, paths)
+    input && input.length != 0 && input.to_i > 0 && input.to_i < paths.length + 1
+  end
+
+  def load_game(path)
+    if File.exist?(path)
+      data = YAML.load_file(path)
+      @word_to_guess = data.word_to_guess
+      @incorrect_guesses_remaining = data.incorrect_guesses_remaining
+      @guesses = data.guesses
+      true
+    else
+      puts "Could not find '#{path}'"
+      false
+    end
+  end
+
+  def display_save_game_info(path)
+    if File.exist?(path)
+      data = YAML.load_file(path)
+      word = data.word_to_guess
+      incorrect_rem = data.incorrect_guesses_remaining
+      guesses = data.guesses
+      puts path_to_save_name(path)
+      puts spread_string(word_in_progress(word, guesses))
+      puts "Guesses: #{spread_string(guesses.join(""))}"
+      puts "Incorrect guesses remaining: #{incorrect_rem}"
+    else
+      puts "Could not find '#{path}'"
+    end
   end
 
   def player_guess
@@ -80,7 +159,7 @@ class Game
       puts @word_to_guess
       puts
     elsif curr_guess == "save"
-      save(name_to_save_as)
+      save
     elsif valid_letter_guess?(curr_guess)
       unless correct_letter_guess?(curr_guess)
         @incorrect_guesses_remaining -= 1
@@ -114,7 +193,7 @@ class Game
   end
 
   def quit_cheat_or_save?(input)
-    ["quit","cheat","save"].include?(input)
+    ["quit", "cheat", "save"].include?(input)
   end
 
   def all_chars_between?(str, char_a, char_b)
@@ -135,10 +214,10 @@ class Game
     end
   end
 
-  def word_in_progress
+  def word_in_progress(word_to_guess, guesses)
     word = ""
-    @word_to_guess.each_char do |char|
-      if @guesses.include?(char)
+    word_to_guess.each_char do |char|
+      if guesses.include?(char)
         word << char
       else
         word << "_"
@@ -147,8 +226,8 @@ class Game
     word
   end
 
-  def display_word_in_progress
-    word = word_in_progress
+  def display_word_in_progress(word_to_guess, guesses)
+    word = word_in_progress(word_to_guess, guesses)
     puts spread_string(word)
     puts
   end

@@ -1,0 +1,8 @@
+--- !ruby/object:Game
+word_to_guess: flashback
+incorrect_guesses_remaining: 6
+guesses:
+- k
+- n
+- l
+- p

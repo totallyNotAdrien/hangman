@@ -1,0 +1,10 @@
+--- !ruby/object:Game
+word_to_guess: toilful
+incorrect_guesses_remaining: 4
+guesses:
+- r
+- s
+- t
+- l
+- n
+- e

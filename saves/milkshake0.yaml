@@ -1,0 +1,11 @@
+--- !ruby/object:Game
+word_to_guess: amebic
+incorrect_guesses_remaining: 3
+guesses:
+- t
+- n
+- r
+- a
+- i
+- l
+- p
