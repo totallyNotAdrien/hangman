@@ -1,9 +1,0 @@
---- !ruby/object:Game
-word_to_guess: prognoses
-incorrect_guesses_remaining: 7
-guesses:
-- n
-- r
-- t
-- s
-- e

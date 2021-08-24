@@ -16,14 +16,14 @@ class Game
       end
     end
 
-    puts "\n\n"
+    puts spread_string("-" * 30)
     display_word_in_progress(@word_to_guess, @guesses)
     display_guesses
     curr_guess = player_guess
     handle_guess(curr_guess)
     until correct_word_guess?(curr_guess) || all_letters_guessed? ||
           out_of_guesses? || curr_guess == "quit" || @end_game
-      puts "\n\n"
+      puts spread_string("-" * 30)
       display_word_in_progress(@word_to_guess, @guesses)
       display_guesses
       curr_guess = player_guess
