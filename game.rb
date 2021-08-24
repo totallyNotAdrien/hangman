@@ -4,6 +4,7 @@ class Game
   attr_reader :word_to_guess, :guesses, :incorrect_guesses_remaining
 
   def initialize
+    @end_game = false
   end
 
   def play(new_game = true)
@@ -21,7 +22,7 @@ class Game
     curr_guess = player_guess
     handle_guess(curr_guess)
     until correct_word_guess?(curr_guess) || all_letters_guessed? ||
-          out_of_guesses? || curr_guess == "quit"
+          out_of_guesses? || curr_guess == "quit" || @end_game
       puts "\n\n"
       display_word_in_progress(@word_to_guess, @guesses)
       display_guesses
@@ -58,16 +59,19 @@ class Game
 
   def path_to_save_to
     print "Enter a name to save this game as (ex: 'bunny'): "
-    dupe_index = 0
+    dupe_index = 1
     input = gets.chomp.strip
-    input = "0" if input.empty?
-    save_name = "#{input}#{dupe_index}"
-    return input if !File.exist?(save_name_to_path(save_name))
+    if input.empty?
+      save_name = "0"
+    else
+      save_name = input
+    end
 
     while File.exist?(save_name_to_path(save_name))
-      dupe_index += 1
       save_name = "#{input}#{dupe_index}"
+      dupe_index += 1
     end
+
     save_name_to_path(save_name)
   end
 
@@ -138,7 +142,8 @@ class Game
     input = ""
     until input.length == 1 || input.length == @word_to_guess.length ||
           quit_cheat_or_save?(input)
-      print "Enter a letter or word to guess or 'quit' to quit: "
+      puts "Enter a letter or word to guess,"
+      print "'quit' to quit, or 'save' to save and quit: "
       input = gets.chomp.strip.downcase
       if @guesses.include?(input)
         puts "You already guessed '#{input}'"
@@ -160,6 +165,7 @@ class Game
       puts
     elsif curr_guess == "save"
       save
+      quit
     elsif valid_letter_guess?(curr_guess)
       unless correct_letter_guess?(curr_guess)
         @incorrect_guesses_remaining -= 1
@@ -172,6 +178,10 @@ class Game
         @incorrect_guesses_remaining -= 1 unless all_chars_in_guesses?(curr_guess)
       end
     end
+  end
+
+  def quit
+    @end_game = true
   end
 
   def correct_word_guess?(guess)

@@ -1,8 +1,10 @@
 --- !ruby/object:Game
-word_to_guess: flashback
+end_game: false
+word_to_guess: pilotless
 incorrect_guesses_remaining: 6
 guesses:
-- k
+- r
+- s
+- t
+- e
 - n
-- l
-- p

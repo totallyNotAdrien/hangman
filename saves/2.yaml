@@ -1,0 +1,13 @@
+--- !ruby/object:Game
+end_game: false
+word_to_guess: suffragist
+incorrect_guesses_remaining: 5
+guesses:
+- r
+- s
+- t
+- e
+- l
+- n
+- i
+- a

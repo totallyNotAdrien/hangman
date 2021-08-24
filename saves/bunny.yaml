@@ -1,0 +1,13 @@
+--- !ruby/object:Game
+end_game: false
+word_to_guess: teachable
+incorrect_guesses_remaining: 5
+guesses:
+- e
+- n
+- t
+- m
+- a
+- s
+- l
+- b
