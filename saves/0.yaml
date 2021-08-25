@@ -1,9 +1,0 @@
---- !ruby/object:Game
-word_to_guess: ceaseless
-incorrect_guesses_remaining: 6
-guesses:
-- r
-- n
-- l
-- a
-- e

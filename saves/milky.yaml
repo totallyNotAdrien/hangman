@@ -1,13 +1,13 @@
 --- !ruby/object:Game
 end_game: false
-word_to_guess: suffragist
-incorrect_guesses_remaining: 5
+word_to_guess: revelry
+incorrect_guesses_remaining: 3
 guesses:
 - r
 - s
 - t
-- e
 - l
 - n
-- i
+- e
+- p
 - a
